@@ -1,0 +1,181 @@
+{
+	"info": {
+		"_postman_id": "0b0ba8b1-0725-4e15-9a1f-43cbacf21b03",
+		"name": "Class-management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14706141"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "basic-register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if(pm.response.code != 201) {",
+									"    postman.setNextRequest(null)",
+									"} else {",
+									"    var res = JSON.parse(responseBody);",
+									"    pm.collectionVariables.set(\"token\", res.data)",
+									"};",
+									"",
+									"pm.test(\"Check code\", () => {",
+									"  pm.expect(pm.response.code).to.eql(201);",
+									"});",
+									"",
+									"pm.test(\"Check data\", () => {",
+									"    const responseJson = pm.response.json();",
+									"",
+									"    pm.expect(responseJson.data).not.eq(null);",
+									"});",
+									"",
+									"pm.test(\"Check messgae\", () => {",
+									"    const responseJson = pm.response.json();",
+									"",
+									"    pm.expect(responseJson.message).to.eq(\"User successfully registered\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"theofargeas@gmail.com\",\n  \"password\": \"Andre1234*\",\n  \"first_name\": \"Theo\",\n  \"last_name\": \"Fargeas\",\n  \"age\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{domain}}/auth/register/native",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"auth",
+								"register",
+								"native"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "basic-login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if(pm.response.code != 200) {",
+									"    postman.setNextRequest(null)",
+									"} else {",
+									"    var res = JSON.parse(responseBody);",
+									"    pm.collectionVariables.set(\"token\", res.data)",
+									"};",
+									"",
+									"pm.test(\"Check code\", () => {",
+									"  pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"",
+									"pm.test(\"Check data\", () => {",
+									"    const responseJson = pm.response.json();",
+									"",
+									"    pm.expect(responseJson.data).not.eq(null);",
+									"});",
+									"",
+									"pm.test(\"Check messgae\", () => {",
+									"    const responseJson = pm.response.json();",
+									"",
+									"    pm.expect(responseJson.message).to.eq(\"Success\");",
+									"});",
+									"",
+									"pm.test(\"Check message code\", () => {",
+									"    const responseJson = pm.response.json();",
+									"",
+									"    pm.expect(responseJson.code).to.eq(\"success_request\");",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"theofargeas@gmail.com\",\n  \"password\": \"Andre1234*\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{domain}}/auth/login/native",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{domain}}"
+							],
+							"path": [
+								"auth",
+								"login",
+								"native"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "domain",
+			"value": "localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "protocol",
+			"value": "http",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
