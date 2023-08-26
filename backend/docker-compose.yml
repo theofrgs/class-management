@@ -1,0 +1,81 @@
+version: "3.8"
+
+services:
+  database:
+    image: mongo:4.4.17-rc0-focal
+    restart: always
+    container_name: back_database
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    networks:
+      - back
+    volumes:
+      - ./init_database/:/docker-entrypoint-initdb.d/
+      - ./data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_INIT_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_INIT_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+      MONGODB_USER: ${DB_USER}
+      MONGODB_PASSWORD: ${DB_PASSWORD}
+      MONGODB_DB: ${DB_NAME}
+
+  development:
+    container_name: back_dev
+    build:
+      context: .
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start:debug
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    networks:
+      - back
+    depends_on:
+      - database
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+
+  test:
+    container_name: back_test
+    build:
+      context: .
+      target: test
+      dockerfile: ./Dockerfile
+    command: npm run "test all"
+    ports:
+      - "3000:3000"
+    networks:
+      - back
+    depends_on:
+      - database
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  production:
+    container_name: back_prod
+    build:
+      context: .
+      target: production
+      dockerfile: ./Dockerfile
+    command: npm run start:prod
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    networks:
+      - back
+    depends_on:
+      - database
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+
+volumes:
+  database:
+
+networks:
+  back:
+    driver: bridge

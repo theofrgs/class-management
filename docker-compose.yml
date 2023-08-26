@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  database:
+    image: mongo:4.4.17-rc0-focal
+    restart: always
+    container_name: backend_database
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    networks:
+      - backend
+    volumes:
+      - ./backend/init_database/:/docker-entrypoint-initdb.d/
+      - ./backend/data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_INIT_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_INIT_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+      MONGODB_USER: ${DB_USER}
+      MONGODB_PASSWORD: ${DB_PASSWORD}
+      MONGODB_DB: ${DB_NAME}
+
+  backend:
+    container_name: backend_dev
+    build:
+      context: ./backend/
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start:debug
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    networks:
+      - backend
+    depends_on:
+      - database
+    volumes:
+      - ./backend/:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+
+  front:
+    container_name: front_dev
+    build:
+      context: ./application/
+      target: development
+      dockerfile: ./Dockerfile
+    command: npm run start
+    ports:
+      - "${WEB_PORT}:${WEB_PORT}"
+    networks:
+      - front
+    volumes:
+      - ./application:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+
+volumes:
+  database:
+
+networks:
+  backend:
+    driver: bridge
+  front:
+    driver: bridge
