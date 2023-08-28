@@ -19,8 +19,8 @@ export class AuthService {
     async loginNative(body: LoginDto): Promise<Object> {
         const users = await this.userService.findByEmail(body.email);
 
-        if (users.length < 1) {
-            throw new HttpException({ message: 'No user has been registered with this account', }, HttpStatus.NOT_FOUND);
+        if (users.length < 1 || (await this.hashService.equals(body.password, users[0].password)) == false) {
+            throw new HttpException({ message: 'The email or the password is incorrect', }, HttpStatus.NOT_FOUND);
         }
         return {
             "message": "User successfully login",

@@ -1,8 +1,47 @@
+"use client"; // This is a client component 👈🏽
 import Head from 'next/head'
 import { FaFacebookF, FaLinkedin, FaGoogle, FaRegEnvelope } from 'react-icons/fa'
 import { MdLockOutline } from 'react-icons/md'
+import { DefaultApi, LoginDto, } from '../../utils/api/api';
+import { ToastContentProps, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import config from '../../utils/defaultConfiguration';
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, PromiseLikeOfReactNode } from 'react';
 
 export default function Login() {
+    const api = new DefaultApi(config);
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const email = (document.getElementById('email') as HTMLInputElement)?.value || '';
+        const password = (document.getElementById('password') as HTMLInputElement)?.value || '';
+
+        const body: LoginDto = {
+            email: email,
+            password: password
+        };
+
+        api.authControllerLogin(body)
+            .then(response => {
+                console.log(response);
+
+                // TODO handle token mangement
+                toast.success("User successfully login")
+            })
+            .catch(error => {
+                console.log(error.response);
+                // TODO code error + Server down
+                if (Array.isArray(error.response.data.message)) {
+                    error.response.data.message.forEach((errorMessage: string) => {
+                        toast.error(errorMessage)
+                    });
+                } else {
+                    toast.error(error.response.data.message)
+                }
+            });
+    }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             <Head>
@@ -36,23 +75,25 @@ export default function Login() {
                             <p className='text-gray-400 my-3'>Or use your email account</p> */}
                             {/* Form section */}
                             <div className='flex flex-col items-center my-2'>
-                                <div className='bg-gray-100 w-64 p-2 flex items-center mb-3'>
-                                    <FaRegEnvelope className='text-gray-400 m-2' />
-                                    <input type='email' name='email' placeholder="Email" className='bg-gray-100 outline-none text-sm flex-1' />
-                                </div>
-                                <div className='bg-gray-100 w-64 p-2 flex items-center mb-3'>
-                                    <MdLockOutline className='text-gray-400 m-2' />
-                                    <input type='password' name='password' placeholder="Password" className='bg-gray-100 outline-none text-sm flex-1' />
-                                </div>
-                                <div className='flex mb-5 w-64 justify-between'>
-                                    <label className='flex items-center text-xs'>
-                                        <input type='checkbox' name='remember' className='mr-1' />
-                                        Remember me
-                                    </label>
-                                    <a href='#' className='text-xs'> Forgot password ? </a>
-                                </div>
-                                {/* onclick TODO*/}
-                                <a href="#" className='border-2 border-green-500 text-green-500 rounded-full px-12 py-2 inline-block font-semi-bold hover:bg-green-500 hover:text-white'>Login</a>
+                                <form onSubmit={handleSubmit}>
+                                    <div className='bg-gray-100 w-64 p-2 flex items-center mb-3'>
+                                        <FaRegEnvelope className='text-gray-400 m-2' />
+                                        <input type='email' id='email' placeholder="Email" className='bg-gray-100 outline-none text-sm flex-1' />
+                                    </div>
+                                    <div className='bg-gray-100 w-64 p-2 flex items-center mb-3'>
+                                        <MdLockOutline className='text-gray-400 m-2' />
+                                        <input type='password' id='password' placeholder="Password" className='bg-gray-100 outline-none text-sm flex-1' />
+                                    </div>
+                                    <div className='flex mb-5 w-64 justify-between'>
+                                        {/* <label className='flex items-center text-xs'>
+                                            <input type='checkbox' id='remember' className='mr-1' />
+                                            Remember me
+                                        </label> */}
+                                        <a href='#' className='text-xs'> Forgot password ? </a>
+                                    </div>
+                                    {/* onclick TODO*/}
+                                    <button type="submit" className='border-2 border-green-500 text-green-500 rounded-full px-12 py-2 inline-block font-semi-bold hover:bg-green-500 hover:text-white'>Login</button>
+                                </form>
                             </div>
                         </div>
                     </div>
