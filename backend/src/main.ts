@@ -7,8 +7,8 @@ async function bootstrap() {
     app.enableCors();
 
     const config = new DocumentBuilder()
-        .setTitle('Theo class -management API')
-        .setDescription('Api from class -management')
+        .setTitle('Theo class-management API')
+        .setDescription('API for class-management')
         .setVersion('1.0')
         .build();
 

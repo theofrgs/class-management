@@ -18,7 +18,7 @@ export class RegisterDTO {
     @IsNotEmpty()
     @IsNumber()
     @IsPositive()
-    age: string;
+    age: number;
 
     @ApiProperty()
     @IsNotEmpty()
